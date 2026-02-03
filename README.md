@@ -44,7 +44,7 @@ No additional functionality is required beyond displaying and closing the calend
 - Names of holidays are not displayed since it was not required
 
 ## 3. Prerequisites
-- Windows
+- Windows 10/11 (client did not specify OS)
 
 ## 4. How To Run
 - Open Calendar.exe
