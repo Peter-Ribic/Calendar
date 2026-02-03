@@ -3,16 +3,41 @@ package ui
 import (
 	"image/color"
 	"strconv"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
 
-// Run creates the window and renders the current month into a manual grid.
+const (
+	MinYear = 1
+	MaxYear = 9999
+)
+
+// Run creates the window with month/year controls and refreshes the manual grid on change.
 func Run(a fyne.App) {
 	w := a.NewWindow("Calendar")
+
+	months := []string{
+		"January", "February", "March", "April", "May", "June",
+		"July", "August", "September", "October", "November", "December",
+	}
+
+	now := time.Now()
+	selectedMonth := int(now.Month())
+	selectedYear := now.Year()
+
+	monthSelect := widget.NewSelect(months, nil)
+	monthSelect.SetSelected(months[selectedMonth-1])
+
+	yearEntry := widget.NewEntry()
+	yearEntry.SetText(strconv.Itoa(selectedYear))
+	yearEntry.SetPlaceHolder("Year")
+
+	status := widget.NewLabel("")
 
 	weekdayHeader := container.NewGridWithColumns(7,
 		headerLabel("Mon"),
@@ -65,12 +90,48 @@ func Run(a fyne.App) {
 		}
 	}
 
-	now := time.Now()
-	render(int(now.Month()), now.Year())
+	monthSelect.OnChanged = func(s string) {
+		m := indexOf(months, s) + 1
+		if m < 1 || m > 12 {
+			return
+		}
+		selectedMonth = m
+
+		y, ok := parseYear(yearEntry.Text)
+		if !ok {
+			status.SetText("Invalid year.")
+			return
+		}
+		status.SetText("")
+		selectedYear = y
+		render(selectedMonth, selectedYear)
+	}
+
+	yearEntry.OnChanged = func(s string) {
+		y, ok := parseYear(s)
+		if !ok {
+			status.SetText("Invalid year.")
+			return
+		}
+		status.SetText("")
+		selectedYear = y
+		render(selectedMonth, selectedYear)
+	}
+
+	render(selectedMonth, selectedYear)
+
+	controls := container.NewHBox(
+		widget.NewLabel("Month:"),
+		monthSelect,
+		widget.NewLabel("Year:"),
+		yearEntry,
+	)
 
 	w.SetContent(container.NewVBox(
+		controls,
 		weekdayHeader,
 		grid,
+		status,
 	))
 
 	w.Resize(fyne.NewSize(420, 380))
@@ -89,16 +150,35 @@ func headerLabel(s string) fyne.CanvasObject {
 	return container.NewMax(bg, container.NewCenter(t))
 }
 
-func colNormal() color.Color {
-	return color.RGBA{255, 255, 255, 255}
-}
+func colNormal() color.Color { return color.RGBA{255, 255, 255, 255} }
 
 func daysIn(month int, year int) int {
 	t := time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local)
 	return t.Day()
 }
 
-// Monday=0 ... Sunday=6
-func weekdayMondayIndex(wd time.Weekday) int {
-	return (int(wd) + 6) % 7
+func weekdayMondayIndex(wd time.Weekday) int { return (int(wd) + 6) % 7 }
+
+func parseYear(s string) (int, bool) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return 0, false
+	}
+	y, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, false
+	}
+	if y < MinYear || y > MaxYear {
+		return 0, false
+	}
+	return y, true
+}
+
+func indexOf(list []string, value string) int {
+	for i, v := range list {
+		if v == value {
+			return i
+		}
+	}
+	return -1
 }
