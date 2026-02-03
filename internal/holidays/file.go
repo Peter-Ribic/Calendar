@@ -12,6 +12,7 @@ import (
 // Load reads holidays from an ASCII file.
 // Line format: DD.MM.YYYY <delimiter> recurringFlag
 // Delimiter can be any non-alphanumeric char ('.' is kept so the date stays intact).
+// Invalid lines are skipped.
 func Load(path string, minYear int, maxYear int) ([]Holiday, error) {
 	f, err := os.Open(path)
 	if err != nil {

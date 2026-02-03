@@ -32,6 +32,8 @@ func Run(a fyne.App) {
 	selectedMonth := int(now.Month())
 	selectedYear := now.Year()
 
+	// Define ui elements.
+
 	monthSelect := widget.NewSelect(months, nil)
 	monthSelect.SetSelected(months[selectedMonth-1])
 
@@ -61,22 +63,22 @@ func Run(a fyne.App) {
 	cellBgs := make([]*canvas.Rectangle, 42)
 	cells := make([]fyne.CanvasObject, 0, 42)
 
+	// Create grid cells.
 	for i := 0; i < 42; i++ {
-		bg := canvas.NewRectangle(colNormal())
-		bg.SetMinSize(fyne.NewSize(44, 34))
+		cellBgs[i] = canvas.NewRectangle(colNormal())
+		cellBgs[i].SetMinSize(fyne.NewSize(44, 34))
 
-		txt := canvas.NewText("", color.Black)
-		txt.Alignment = fyne.TextAlignCenter
-		txt.TextSize = 14
+		cellTexts[i] = canvas.NewText("", color.Black)
+		cellTexts[i].Alignment = fyne.TextAlignCenter
+		cellTexts[i].TextSize = 14
 
-		cellBgs[i] = bg
-		cellTexts[i] = txt
-		cells = append(cells, container.NewMax(bg, container.NewCenter(txt)))
+		cells = append(cells, container.NewStack(cellBgs[i], container.NewCenter(cellTexts[i])))
 	}
 
 	grid := container.NewGridWithColumns(7, cells...)
 
 	render := func(month int, year int) {
+		// Reset all cells.
 		for i := 0; i < 42; i++ {
 			cellTexts[i].Text = ""
 			cellBgs[i].FillColor = colNormal()
@@ -118,6 +120,7 @@ func Run(a fyne.App) {
 	monthSelect.OnChanged = func(s string) {
 		selectedMonth := indexOf(months, s) + 1
 		if selectedMonth < 1 || selectedMonth > 12 {
+			// Should not happen.
 			return
 		}
 		selectedYear, ok := calendar.ParseYear(yearEntry.Text, MinYear, MaxYear)
@@ -152,11 +155,13 @@ func Run(a fyne.App) {
 		render(selectedMonth, selectedYear)
 	}
 
+	// Initial render.
 	render(selectedMonth, selectedYear)
 
 	// Extend width of year entry.
 	yearWrap := container.NewGridWrap(fyne.NewSize(80, yearEntry.MinSize().Height), yearEntry)
 
+	// Join control elements.
 	controls := container.NewHBox(
 		widget.NewLabel("Month:"),
 		monthSelect,
@@ -164,6 +169,7 @@ func Run(a fyne.App) {
 		yearWrap,
 	)
 
+	// Join all elements in the window.
 	w.SetContent(container.NewVBox(
 		// The client did not pay for an exit button.
 		controls,
