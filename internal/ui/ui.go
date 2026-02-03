@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Peter-Ribic/Calendar/internal/holidays"
+	"github.com/Peter-Ribic/Calendar/internal/uihelpers"
 )
 
 const (
@@ -37,6 +38,9 @@ func Run(a fyne.App) {
 	yearEntry := widget.NewEntry()
 	yearEntry.SetText(strconv.Itoa(selectedYear))
 	yearEntry.SetPlaceHolder("Year")
+
+	jumpEntry := widget.NewEntry()
+	jumpEntry.SetPlaceHolder("Jump to date (DD.MM.YYYY) and press Enter")
 
 	status := widget.NewLabel("")
 
@@ -112,30 +116,39 @@ func Run(a fyne.App) {
 	}
 
 	monthSelect.OnChanged = func(s string) {
-		m := indexOf(months, s) + 1
-		if m < 1 || m > 12 {
+		selectedMonth := indexOf(months, s) + 1
+		if selectedMonth < 1 || selectedMonth > 12 {
 			return
 		}
-		selectedMonth = m
-
-		y, ok := parseYear(yearEntry.Text)
+		selectedYear, ok := parseYear(yearEntry.Text)
 		if !ok {
 			status.SetText("Invalid year.")
 			return
 		}
 		status.SetText("")
-		selectedYear = y
 		render(selectedMonth, selectedYear)
 	}
 
 	yearEntry.OnChanged = func(s string) {
-		y, ok := parseYear(s)
+		selectedYear, ok := parseYear(s)
 		if !ok {
 			status.SetText("Invalid year.")
 			return
 		}
 		status.SetText("")
-		selectedYear = y
+		render(selectedMonth, selectedYear)
+	}
+
+	jumpEntry.OnSubmitted = func(s string) {
+		_, selectedMonth, selectedYear, ok := uihelpers.ParseDDMMYYYY(s, MinYear, MaxYear)
+		if !ok {
+			status.SetText("Invalid date. Use DD.MM.YYYY")
+			return
+		}
+
+		monthSelect.SetSelected(months[selectedMonth-1])
+		yearEntry.SetText(strconv.Itoa(selectedYear))
+		status.SetText("")
 		render(selectedMonth, selectedYear)
 	}
 
@@ -149,7 +162,9 @@ func Run(a fyne.App) {
 	)
 
 	w.SetContent(container.NewVBox(
+		// The client did not pay for an exit button.
 		controls,
+		jumpEntry,
 		weekdayHeader,
 		grid,
 		status,
@@ -168,7 +183,7 @@ func headerLabel(s string) fyne.CanvasObject {
 	bg := canvas.NewRectangle(color.RGBA{240, 240, 240, 255})
 	bg.SetMinSize(fyne.NewSize(44, 28))
 
-	return container.NewMax(bg, container.NewCenter(t))
+	return container.NewStack(bg, container.NewCenter(t))
 }
 
 func colNormal() color.Color { return color.RGBA{255, 255, 255, 255} }
