@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Peter-Ribic/Calendar/internal/holidays"
 )
 
 const (
@@ -39,7 +40,8 @@ func Run(a fyne.App) {
 
 	status := widget.NewLabel("")
 
-	//holidayList, _ := holidays.Load("holidays.txt", MinYear, MaxYear)
+	// Client did not request nor pay for error handling :).
+	holidayList, _ := holidays.Load("holidays.txt", MinYear, MaxYear)
 
 	weekdayHeader := container.NewGridWithColumns(7,
 		headerLabel("Mon"),
@@ -85,16 +87,26 @@ func Run(a fyne.App) {
 		for d := 1; d <= days; d++ {
 			idx := offset + (d - 1)
 			if idx < 0 || idx >= 42 {
+				// Safety check, should not happen.
 				continue
 			}
 			cellTexts[idx].Text = strconv.Itoa(d)
 
 			col := idx % 7
-			if col == 6 { // Sunday in Mon..Sun layout
-				cellBgs[idx].FillColor = colSunday()
-				cellBgs[idx].Refresh()
-			}
+			isSunday := (col == 6)
+			isHol := holidays.IsHoliday(d, month, year, holidayList)
 
+			switch {
+			case isHol && isSunday:
+				cellBgs[idx].FillColor = colHolidaySunday()
+			case isHol:
+				cellBgs[idx].FillColor = colHoliday()
+			case isSunday:
+				cellBgs[idx].FillColor = colSunday()
+			default:
+				cellBgs[idx].FillColor = colNormal()
+			}
+			cellBgs[idx].Refresh()
 			cellTexts[idx].Refresh()
 		}
 	}
@@ -160,6 +172,10 @@ func headerLabel(s string) fyne.CanvasObject {
 }
 
 func colNormal() color.Color { return color.RGBA{255, 255, 255, 255} }
+
+func colHoliday() color.Color { return color.RGBA{235, 255, 235, 255} }
+
+func colHolidaySunday() color.Color { return color.RGBA{255, 245, 220, 255} }
 
 func daysIn(month int, year int) int {
 	t := time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local)
