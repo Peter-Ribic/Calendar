@@ -86,6 +86,13 @@ func Run(a fyne.App) {
 				continue
 			}
 			cellTexts[idx].Text = strconv.Itoa(d)
+
+			col := idx % 7
+			if col == 6 { // Sunday in Mon..Sun layout
+				cellBgs[idx].FillColor = colSunday()
+				cellBgs[idx].Refresh()
+			}
+
 			cellTexts[idx].Refresh()
 		}
 	}
@@ -182,3 +189,5 @@ func indexOf(list []string, value string) int {
 	}
 	return -1
 }
+
+func colSunday() color.Color { return color.RGBA{255, 235, 235, 255} }
