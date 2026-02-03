@@ -3,13 +3,13 @@ package ui
 import (
 	"image/color"
 	"strconv"
-	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Peter-Ribic/Calendar/internal/calendar"
 	"github.com/Peter-Ribic/Calendar/internal/holidays"
 	"github.com/Peter-Ribic/Calendar/internal/uihelpers"
 )
@@ -85,8 +85,8 @@ func Run(a fyne.App) {
 		}
 
 		first := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
-		offset := weekdayMondayIndex(first.Weekday())
-		days := daysIn(month, year)
+		offset := calendar.WeekdayMondayIndex(first.Weekday())
+		days := calendar.DaysIn(month, year)
 
 		for d := 1; d <= days; d++ {
 			idx := offset + (d - 1)
@@ -120,7 +120,7 @@ func Run(a fyne.App) {
 		if selectedMonth < 1 || selectedMonth > 12 {
 			return
 		}
-		selectedYear, ok := parseYear(yearEntry.Text)
+		selectedYear, ok := calendar.ParseYear(yearEntry.Text, MinYear, MaxYear)
 		if !ok {
 			status.SetText("Invalid year.")
 			return
@@ -130,7 +130,7 @@ func Run(a fyne.App) {
 	}
 
 	yearEntry.OnChanged = func(s string) {
-		selectedYear, ok := parseYear(s)
+		selectedYear, ok := calendar.ParseYear(s, MinYear, MaxYear)
 		if !ok {
 			status.SetText("Invalid year.")
 			return
@@ -191,28 +191,6 @@ func colNormal() color.Color { return color.RGBA{255, 255, 255, 255} }
 func colHoliday() color.Color { return color.RGBA{235, 255, 235, 255} }
 
 func colHolidaySunday() color.Color { return color.RGBA{255, 245, 220, 255} }
-
-func daysIn(month int, year int) int {
-	t := time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local)
-	return t.Day()
-}
-
-func weekdayMondayIndex(wd time.Weekday) int { return (int(wd) + 6) % 7 }
-
-func parseYear(s string) (int, bool) {
-	s = strings.TrimSpace(s)
-	if s == "" {
-		return 0, false
-	}
-	y, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, false
-	}
-	if y < MinYear || y > MaxYear {
-		return 0, false
-	}
-	return y, true
-}
 
 func indexOf(list []string, value string) int {
 	for i, v := range list {
