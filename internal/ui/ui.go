@@ -197,9 +197,11 @@ func headerLabel(s string) fyne.CanvasObject {
 
 func colNormal() color.Color { return color.RGBA{255, 255, 255, 255} }
 
-func colHoliday() color.Color { return color.RGBA{235, 255, 235, 255} }
+func colHoliday() color.Color { return color.RGBA{200, 255, 200, 255} }
 
-func colHolidaySunday() color.Color { return color.RGBA{255, 245, 220, 255} }
+func colSunday() color.Color { return color.RGBA{255, 200, 200, 255} }
+
+func colHolidaySunday() color.Color { return color.RGBA{255, 240, 200, 255} }
 
 func indexOf(list []string, value string) int {
 	for i, v := range list {
@@ -209,5 +211,3 @@ func indexOf(list []string, value string) int {
 	}
 	return -1
 }
-
-func colSunday() color.Color { return color.RGBA{255, 235, 235, 255} }
