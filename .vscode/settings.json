@@ -1,8 +1,0 @@
-{
-  "go.toolsManagement.go": "/data1/home/peterr/tools/go/bin/go",
-  "go.goroot": "/data1/home/peterr/tools/go",
-  "go.toolsEnvVars": {
-    "GOROOT": "/data1/home/peterr/tools/go",
-    "PATH": "/data1/home/peterr/tools/go/bin:/data1/home/peterr/go/bin:${env:PATH}"
-  }
-}
