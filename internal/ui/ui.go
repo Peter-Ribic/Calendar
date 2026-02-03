@@ -118,27 +118,30 @@ func Run(a fyne.App) {
 	}
 
 	monthSelect.OnChanged = func(s string) {
-		selectedMonth := indexOf(months, s) + 1
-		if selectedMonth < 1 || selectedMonth > 12 {
+		m := indexOf(months, s) + 1
+		if m < 1 || m > 12 {
 			// Should not happen.
 			return
 		}
-		selectedYear, ok := calendar.ParseYear(yearEntry.Text, MinYear, MaxYear)
+		selectedMonth = m
+		y, ok := calendar.ParseYear(yearEntry.Text, MinYear, MaxYear)
 		if !ok {
 			status.SetText("Invalid year.")
 			return
 		}
+		selectedYear = y
 		status.SetText("")
 		render(selectedMonth, selectedYear)
 	}
 
 	yearEntry.OnChanged = func(s string) {
-		selectedYear, ok := calendar.ParseYear(s, MinYear, MaxYear)
+		y, ok := calendar.ParseYear(s, MinYear, MaxYear)
 		if !ok {
 			status.SetText("Invalid year.")
 			return
 		}
 		status.SetText("")
+		selectedYear = y
 		render(selectedMonth, selectedYear)
 	}
 
