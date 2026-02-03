@@ -39,6 +39,8 @@ func Run(a fyne.App) {
 
 	status := widget.NewLabel("")
 
+	//holidayList, _ := holidays.Load("holidays.txt", MinYear, MaxYear)
+
 	weekdayHeader := container.NewGridWithColumns(7,
 		headerLabel("Mon"),
 		headerLabel("Tue"),

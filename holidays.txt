@@ -1,3 +1,5 @@
+# DATE<delimiter>RECURRING_FLAG
+# DATE is DD.MM.YYYY (year ignored if recurring is true)
 01.01.2000;1
 25.12.2000|1
 08.02.2026,0
