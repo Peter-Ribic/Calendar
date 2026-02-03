@@ -40,6 +40,11 @@ No additional functionality is required beyond displaying and closing the calend
 - Invalid entries (rows) in this file should be skipped
 
 ### 2.5 Restrictions
-- No additional functionality is required except closing the application (window exit button will do)
 - The calendar relies on Go’s standard time library, which only supports dates between years 1 and 9999, the year range is therefore intentionally limited to ensure correctness
+- Names of holidays are not displayed since it was not required
 
+## 3. Prerequisites
+- Windows
+
+## 4. How To Run
+- Open Calendar.exe
