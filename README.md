@@ -42,9 +42,11 @@ No additional functionality is required beyond displaying and closing the calend
 ### 2.5 Restrictions
 - The calendar relies on Go’s standard time library, which only supports dates between years 1 and 9999, the year range is therefore intentionally limited to ensure correctness
 - Names of holidays are not displayed since it was not required
+- If holidays.txt is not present when program is run, holidays will not be displayed
 
 ## 3. Prerequisites
 - Windows 10/11 (client did not specify OS)
 
 ## 4. How To Run
-- Open Calendar.exe
+1. Clone repo to your computer
+2. Open Calendar.exe
