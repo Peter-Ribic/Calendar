@@ -154,11 +154,14 @@ func Run(a fyne.App) {
 
 	render(selectedMonth, selectedYear)
 
+	// Extend width of year entry.
+	yearWrap := container.NewGridWrap(fyne.NewSize(80, yearEntry.MinSize().Height), yearEntry)
+
 	controls := container.NewHBox(
 		widget.NewLabel("Month:"),
 		monthSelect,
 		widget.NewLabel("Year:"),
-		yearEntry,
+		yearWrap,
 	)
 
 	w.SetContent(container.NewVBox(
